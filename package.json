@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/mlding/student_report_card_api#readme",
   "dependencies": {
-    "express": "^4.15.3"
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "redis": "^2.7.1"
   }
 }
