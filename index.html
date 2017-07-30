@@ -2,13 +2,181 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ajax</title>
+    <title>Bootstrap practise</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+      integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g="
+      crossorigin="anonymous">
+    </script>
+    <script src="/bootstrap-3.3.7-dist/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="/bootstrap-3.3.7-dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="/app.css" />
 </head>
 <body>
-  <form action="/add-anything" method="post">
-    <input type="text" name="userName" placeholder="userName" /><br/>
-    <input type="number" name="age" placeholder="age" /><br/>
-    <button type="submit">submit</button>
-  </form>
+  <div class="container">
+      <h2>学生成绩单（web版）</h2>
+      <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#showAll" id="allTab">所有学生成绩</a></li>
+        <li><a data-toggle="tab" href="#query" id="queryTab">查询学生成绩</a></li>
+        <li><a data-toggle="tab" href="#add">增加学生成绩</a></li>
+      </ul>
+
+      <div class="tab-content">
+        <div id="showAll" class="tab-pane fade in active">
+          <table class="table">
+            <tr>
+              <th>Name</th>
+              <th>StudentNum</th>
+              <th>Ethnic</th>
+              <th>Class</th>
+              <th>MandarinScore</th>
+              <th>MathScore</th>
+              <th>EnglishScore</th>
+              <th>ProgrammingScore</th>
+              <th>AverageScore</th>
+              <th>TotalScore</th>
+            </tr>
+          </table>
+        </div>
+        <div id="query" class="tab-pane fade">
+          <div class="label-input">
+            <input type="text" class="form-control" id="numList" placeholder="Num, Num">
+            <button class="btn btn-default" id="queryBtn">Query</button>
+
+            <h3>成绩单</h3>
+            <table class="table">
+              <tr>
+                <th>Name</th>
+                <th>StudentNum</th>
+                <th>Ethnic</th>
+                <th>Class</th>
+                <th>MandarinScore</th>
+                <th>MathScore</th>
+                <th>EnglishScore</th>
+                <th>ProgrammingScore</th>
+                <th>AverageScore</th>
+                <th>TotalScore</th>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div id="add" class="tab-pane fade">
+          <form class="form-inline" method="post" action="/student">
+            <div class="form-group">
+              <div class="label-input">
+                <label for="inputName">Name</label>
+                <input type="text" class="form-control" id="inputName" name="inputName" placeholder="Name">
+              </div>
+              <div class="label-input">
+                <label for="inputNum">StudentNum</label>
+                <input type="text" class="form-control" id="inputNum" name="inputNum" placeholder="StudentNum">
+              </div>
+              <div class="label-input">
+                <label for="ethnic">Ethnic</label>
+                <input type="text" class="form-control" id="ethnic" name="ethnic" placeholder="Ethnic">
+              </div>
+              <div class="label-input">
+                <label for="inputClass">Class</label>
+                <input type="text" class="form-control" id="inputClass" name="inputClass" placeholder="Class">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="label-input">
+                <label for="inputMandarinScore">MandarinScore</label>
+                <input type="text" class="form-control" id="inputMandarinScore" name="inputMandarinScore" placeholder="MandarinScore">
+              </div>
+              <div class="label-input">
+                <label for="inputMathScore">MathScore</label>
+                <input type="text" class="form-control" id="inputMathScore" name="inputMathScore" placeholder="MathScore">
+              </div>
+              <div class="label-input">
+                <label for="inputEnglishScore">EnglishScore</label>
+                <input type="text" class="form-control" id="inputEnglishScore" name="inputEnglishScore" placeholder="EnglishScore">
+              </div>
+              <div class="label-input">
+                <label for="inputProgrammingScore">MathScore</label>
+                <input type="text" class="form-control" id="inputProgrammingScore" name="inputProgrammingScore" placeholder="MathScore">
+              </div>
+            </div>
+            <div class="btns">
+              <button type="reset" class="btn btn-default">Reset</button>
+              <button type="submit" class="btn btn-default">Submit</button>
+            </div>
+        </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="alterModal" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">修改学生成绩单</h4>
+          </div>
+          <div class="modal-body">
+            <form class="form-inline">
+              <div class="form-group">
+                <div class="label-input">
+                  <label for="inputName">Name</label>
+                  <input type="text" class="form-control" id="alterName" placeholder="Name">
+                </div>
+                <div class="label-input">
+                  <label for="inputNum">StudentNum</label>
+                  <input type="text" class="form-control" id="alterNum" placeholder="StudentNum" readonly>
+                </div>
+                <div class="label-input">
+                  <label for="ethnic">Ethnic</label>
+                  <input type="text" class="form-control" id="alterEthnic" placeholder="Ethnic">
+                </div>
+                <div class="label-input">
+                  <label for="inputClass">Class</label>
+                  <input type="text" class="form-control" id="alterClass" placeholder="Class">
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="label-input">
+                  <label for="inputMandarinScore">MandarinScore</label>
+                  <input type="text" class="form-control" id="alterMandarinScore" placeholder="MandarinScore">
+                </div>
+                <div class="label-input">
+                  <label for="inputMathScore">MathScore</label>
+                  <input type="text" class="form-control" id="alterMathScore" placeholder="MathScore">
+                </div>
+                <div class="label-input">
+                  <label for="inputEnglishScore">EnglishScore</label>
+                  <input type="text" class="form-control" id="alterEnglishScore" placeholder="EnglishScore">
+                </div>
+                <div class="label-input">
+                  <label for="inputProgrammingScore">MathScore</label>
+                  <input type="text" class="form-control" id="alterProgrammingScore" placeholder="MathScore">
+                </div>
+              </div>
+          </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal" id="alterStudentInfoBtn">Alter</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="deleteModal" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">删除学生成绩单</h4>
+          </div>
+          <div class="modal-body">
+            <p>确定删除？</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal" id="deleteStudentInfoBtn">Sure</button>
+          </div>
+        </div>
+      </div>
+  </div>
+  <script src="/static/bundle.js"></script>
 </body>
 </html>

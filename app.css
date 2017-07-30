@@ -1,0 +1,37 @@
+body {
+  background-color: lightgray;
+}
+
+.container {
+  width: 1170px;
+  margin: 0 auto;
+}
+
+.nav-tabs {
+  margin: 20px 0;
+}
+
+.msg {
+  font-size: 18px;
+  margin: 20px 0;
+}
+
+.success {
+  color: green;
+}
+
+.warning {
+  color: red;
+}
+
+.label-input label {
+  min-width: 200px;
+}
+
+.label-input input {
+  min-width: 500px;
+}
+
+.btns {
+  margin: 20px 0;
+}

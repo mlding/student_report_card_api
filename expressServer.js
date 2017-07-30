@@ -2,34 +2,57 @@ const redis = require('redis');
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const StudentModule = require('./src/student')
+
 const client = redis.createClient('6379', '127.0.0.1');
 const app = express();
-app.use(bodyParser.urlencoded({ extended: true }));
 
-// 应用程序会启动服务器，并在端口 3000 上侦听连接。此应用程序以“Hello World!”响应针对根 URL (/) 或路由的请求。对于其他所有路径，它将以 404 Not Found 进行响应。
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(__dirname + '/'));
+
 let accessCount = 0;
 app.get('/', (req, res) => {
   // res.send('hello world');
-  res.sendFile('index.html', {root: './'});
+  res.sendFile(__dirname + 'index.html');
   accessCount++;
   client.set('accessCount', accessCount, redis.print);
   client.get('accessCount', (err, res) => {
     console.log(res);
   });
-
 });
 
-app.post('/add-anything', (req, res) => {
-  const userName = req.body.userName;
-  const age = req.body.age;
-  client.hmset("formData", {
-    "userName": userName,
-    "age": age
-  });
-  client.hgetall("formData", (err, resObj) => {
-    console.dir(resObj);
-    res.send(resObj);
-  });
+app.post('/student', (req, res) => {
+  const inputAttr = ["inputName", "inputNum", "ethnic", "inputClass",
+     "inputMandarinScore", "inputMathScore", "inputEnglishScore", "inputProgrammingScore"];
+  const inputData = inputAttr.map(ele => {
+     return req.body[ele];
+   });
+  const inputStr = inputData.join(", ");
+  const isInputStrValid = StudentModule.Student.validateStudentString(inputStr);
+
+  const allStudentInfo = JSON.parse(client.hgetall('allStudentInfo', function(err, allStudentInfo) {
+    console.log(allStudentInfo);
+  }));
+
+  let isDuplicateNumStudent = false;
+  if(allStudentInfo) {
+      isDuplicateNumStudent = Object.keys(allStudentInfo).some(studentNum => {
+          return studentNum === inputData[1];
+      });
+  }
+
+  if(isInputStrValid && !isDuplicateNumStudent) {
+    const student = StudentModule.Student.initStudentFromString(inputStr);
+    const stuNum = student.num;
+
+    client.hmset('allStudentInfo', {
+        `${stuNum}`: JSON.stringify(student)
+    });
+
+    res.send(student);
+  } else {
+      res.send('404');
+  }
 });
 
 app.listen(3000, () => {
