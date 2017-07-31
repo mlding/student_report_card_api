@@ -60,7 +60,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "68bea9be2f1bcc692777"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "75ddb9d0120536d63051"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -721,27 +721,17 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 const StudentModule = __webpack_require__(1);
-
-function getAllStudentsInfo() {
-  const allStudentInfo = [];
-  for(let i=0;i<localStorage.length;i++) {
-    let studentNum = localStorage.key(i);
-    let isStudentNumValid = /^([0-9]{2})$/.test(studentNum);
-    if(!isStudentNumValid) {
-      //break表示跳出循环，continue表示结束本次循环
-      continue;
-    }
-    const studentInfoObj = JSON.parse(localStorage[studentNum]);
-    allStudentInfo.push(studentInfoObj);
-  }
-  return allStudentInfo;
-}
+const BASE_URL = "http://localhost:3000"
 
 function fixedTwoDecimal(number) {
     return number.toFixed(2);
 }
 
-function addStudentInfo(inputData, isAlter) {
+/* function addStudentInfo(inputAttr, isAlter) {
+    const inputData = inputAttr.map(ele => {
+       return $(ele).val();
+     });
+    const inputStr = inputData.join(", ");
     const isInputStrValid = StudentModule.Student.validateStudentString(inputStr);
 
     const allStudentInfo = getAllStudentsInfo();
@@ -761,20 +751,7 @@ function addStudentInfo(inputData, isAlter) {
       msgType = 'success';
     }
     $(".btns").before(`<div class="${msgType} msg">${msg}</div>`);
-}
-
-module.exports = {
-  addStudentInfo
-}
-
-/*$("#add form").submit(function(e) {
-  e.preventDefault();
-  $(".msg").remove();
-  const inputAttr = ["#inputName", "#inputNum", "#ethnic", "#inputClass",
-     "#inputMandarinScore", "#inputMathScore", "#inputEnglishScore", "#inputProgrammingScore"];
-  addStudentInfo(inputAttr);
-  });
-  */
+}*/
 
 $("#queryTab").click(function() {
   $("#numList").val('');
@@ -783,38 +760,45 @@ $("#queryTab").click(function() {
 
 $("#allTab").click(function(e) {
   e.preventDefault();
-  const allStudentInfo = getAllStudentsInfo();
   let studentsInfoStr = '';
   $("table tr td").remove();
-  allStudentInfo.forEach(studentInfo => {
-     studentsInfoStr += `<tr><td>${studentInfo.name}</td><td>${studentInfo.num}</td><td>${studentInfo.ethnic}</td><td>${studentInfo.klass}</td><td>${studentInfo.mandarinScore}</td><td>${studentInfo.mathScore}</td><td>${studentInfo.englishScore}</td><td>${studentInfo.programmingScore}</td><td>${fixedTwoDecimal(studentInfo.averageScore)}</td><td>${fixedTwoDecimal(studentInfo.totalScore)}</td</tr>`;
-  });
+  // allStudentInfo.forEach(studentInfo => {
+  //    studentsInfoStr += `<tr><td>${studentInfo.name}</td><td>${studentInfo.num}</td><td>${studentInfo.ethnic}</td><td>${studentInfo.klass}</td><td>${studentInfo.mandarinScore}</td><td>${studentInfo.mathScore}</td><td>${studentInfo.englishScore}</td><td>${studentInfo.programmingScore}</td><td>${fixedTwoDecimal(studentInfo.averageScore)}</td><td>${fixedTwoDecimal(studentInfo.totalScore)}</td</tr>`;
+  // });
 
   $("table").append(studentsInfoStr);
 });
 
 $("#queryBtn").click(function(e) {
-  $(".msg").remove();
   $("table tr td").remove();
   e.preventDefault();
-
   const numsQueryStr = $("#numList").val();
-  const isQueryStrValid = StudentModule.Student.validateQueryString(numsQueryStr);
-  const warningMsg = '请按正确的格式输入要打印的学生的学号（格式： 学号, 学号,…）';
-  const allStudentInfo = getAllStudentsInfo();
 
-  let domStr = `<div class="warning msg">${warningMsg}</div>`;
+  let request = new XMLHttpRequest();
+  request.open('get', BASE_URL + `/students?queryStr=${numsQueryStr}`);
+  let domStr = '';
+  request.onreadystatechange = function () {
+      if (request.readyState == 4) {
+          const students = JSON.parse(request.responseText);
+          if (request.status == 200) {
+            if(students.statusCode == 400) {
+            } else {
+              const response = `${students.map((student) => {
+                return `<tr><td>${student.name}</td><td>${student.num}</td><td>${student.ethnic}</td><td>${student.klass}</td><td>${student.mandarinScore}</td><td>${student.mathScore}</td><td>${student.englishScore}</td><td>${student.programmingScore}</td><td>${fixedTwoDecimal(student.averageScore)}</td><td>${fixedTwoDecimal(student.totalScore)}</td><td><a class="alterLink" href="#" data-stu-num="${student.num}">修改</a></td><td><a class="deleteLink" href="#" data-stu-num="${student.num}">删除</a></td></tr>`;
+              })}
+          <tr><td>全班总分平均数：${fixedTwoDecimal(StudentModule.Student.averageOfTotalScoreSum(students))}</td></tr>
+          <tr><td>全班总分中位数：${fixedTwoDecimal(StudentModule.Student.medianOfTotalScoreSum(students))}</td></tr></table>`;
+              domStr = response;
+            }
+          } else {
+              domStr = students.errMsg;
+          }
+        }
 
-  if(isQueryStrValid) {
-    const students = StudentModule.Student.query(numsQueryStr, allStudentInfo);
-    const response = `${students.map((student) => {
-      return `<tr><td>${student.name}</td><td>${student.num}</td><td>${student.ethnic}</td><td>${student.klass}</td><td>${student.mandarinScore}</td><td>${student.mathScore}</td><td>${student.englishScore}</td><td>${student.programmingScore}</td><td>${fixedTwoDecimal(student.averageScore)}</td><td>${fixedTwoDecimal(student.totalScore)}</td><td><a class="alterLink" href="#" data-stu-num="${student.num}">修改</a></td><td><a class="deleteLink" href="#" data-stu-num="${student.num}">删除</a></td></tr>`;
-    })}
-<tr><td>全班总分平均数：${fixedTwoDecimal(StudentModule.Student.averageOfTotalScoreSum(students))}</td></tr>
-<tr><td>全班总分中位数：${fixedTwoDecimal(StudentModule.Student.medianOfTotalScoreSum(students))}</td></tr></table>`;
-    domStr = response;
-  }
-  $("table").append(domStr);
+      $("table").append(domStr);
+  };
+  request.setRequestHeader("Content-Type", "application/json");
+  request.send();
 });
 
 $("table").on("click", ".alterLink", function() {
@@ -889,7 +873,7 @@ class Student {
 
   static validateQueryString(queryString){
     const re = /^[0-9]{2}(, [0-9]{2})*$/;
-    return re.test(queryString);
+    return queryString === '' || re.test(queryString);
   }
 
   static query(queryString, allStudentInfo){

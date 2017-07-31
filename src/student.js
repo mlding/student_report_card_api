@@ -31,7 +31,7 @@ class Student {
 
   static validateQueryString(queryString){
     const re = /^[0-9]{2}(, [0-9]{2})*$/;
-    return re.test(queryString);
+    return queryString === '' || re.test(queryString);
   }
 
   static query(queryString, allStudentInfo){
